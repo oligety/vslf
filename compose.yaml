@@ -1,26 +1,27 @@
 services:
-  backend:
+  vslf-backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
+    container_name: vslf-backend
+    restart: unless-stopped
     networks:
-      - vslf-network
+      - caddy_net
 
-  frontend:
+  vslf-frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=http://localhost:3000
-    ports:
-      - "8081:80"
+        # Use a relative path so the browser targets your Caddy domain
+        - VITE_API_URL=/api
+    container_name: vslf-frontend
+    restart: unless-stopped
     depends_on:
-      - backend
+      - vslf-backend
     networks:
-      - vslf-network
+      - caddy_net
 
 networks:
-  vslf-network:
-    driver: bridge
+  caddy_net:
+    external: true
