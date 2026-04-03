@@ -36,9 +36,12 @@ const file = ref(null);
 const fileUploadRef = ref(null);
 const error = ref(null);
 const success = ref(false);
+const isProcessing = ref(false);
 
 const onFileSelect = (event) => {
   file.value = event.files[0];
+  error.value = null;
+  success.value = false;
 };
 
 const setError = (message) => {
@@ -82,6 +85,7 @@ const createFile = async () => {
 
   error.value = null;
   success.value = false;
+  isProcessing.value = true;
 
   const formData = new FormData();
   formData.append('file', file.value);
@@ -98,115 +102,136 @@ const createFile = async () => {
     success.value = true;
   } catch {
     error.value = 'Fehler beim Erstellen der Datei.';
+  } finally {
+    isProcessing.value = false;
   }
 };
 </script>
 
 <template>
-  <div class="layout-wrapper">
-    <header class="header flex align-items-center px-4 py-3 border-bottom-1 border-gray-200">
-      <img :src="logo" alt="VSLF Logo" class="header-logo" />
-      <div class="header-title ml-4">
-        <h2 class="m-0 font-medium">
-          Datei für SBB erstellen
-        </h2>
+  <div class="layout-wrapper bg-slate-50">
+    <header
+      class="header flex align-items-center px-4 md:px-6 py-4 bg-white border-bottom-1 border-slate-200"
+    >
+      <div class="container flex align-items-center w-full max-w-30rem mx-auto">
+        <img :src="logo" alt="VSLF Logo" class="header-logo" />
+        <div class="header-title ml-4">
+          <h1 class="m-0 text-xl font-semibold text-slate-800">SBB Datenexport</h1>
+        </div>
       </div>
     </header>
 
-    <main class="content-container p-4 md:p-6" style="max-width: 1000px; margin: auto">
-      <div class="card p-4 shadow-1 border-round bg-white">
+    <main class="content-container p-4 md:p-6 flex flex-column align-items-center">
+      <div class="card w-full max-w-30rem p-5 shadow-sm border-round-xl bg-white">
+        <p class="mt-0 mb-5 text-slate-600 line-height-3">
+          Wählen Sie den gewünschten Zeitraum und die Excel-Datei mit den SBB Personalnummern aus,
+          um die VSLF-Textdatei zu generieren.
+        </p>
+
         <div class="grid formgrid p-fluid">
           <!-- Monat -->
           <div class="field col-12 md:col-6 mb-4">
-            <label for="month" class="block font-bold mb-2">Monat</label>
+            <label for="month" class="block font-medium text-slate-700 mb-2">Monat</label>
             <Select
-                id="month"
-                v-model="selectedMonth"
-                :options="MONTHS"
-                option-label="name"
-                placeholder="-"
-                class="w-full"
+              id="month"
+              v-model="selectedMonth"
+              :options="MONTHS"
+              option-label="name"
+              placeholder="Auswählen"
+              class="w-full"
             />
           </div>
           <!-- Jahr -->
           <div class="field col-12 md:col-6 mb-4">
-            <label for="year" class="block font-bold mb-2">Jahr</label>
+            <label for="year" class="block font-medium text-slate-700 mb-2">Jahr</label>
             <Select
-                id="year"
-                v-model="selectedYear"
-                :options="YEARS"
-                option-label="name"
-                placeholder="-"
-                class="w-full"
+              id="year"
+              v-model="selectedYear"
+              :options="YEARS"
+              option-label="name"
+              placeholder="Auswählen"
+              class="w-full"
             />
           </div>
           <!-- Datei -->
-          <div class="field col-12 mb-4">
-            <label for="file" class="block font-bold mb-2">Datei *.xlsx (SBB Personal Nr.)</label>
-            <div class="p-inputgroup">
+          <div class="field col-12 mb-5">
+            <label for="file" class="block font-medium text-slate-700 mb-2">Datei (.xlsx)</label>
+            <div class="flex flex-column gap-2">
               <FileUpload
-                  ref="fileUploadRef"
-                  mode="basic"
-                  name="file"
-                  accept=".xlsx"
-                  :auto="false"
-                  choose-label="Datei auswählen"
-                  class="p-button-secondary"
-                  @select="onFileSelect"
+                ref="fileUploadRef"
+                mode="basic"
+                name="file"
+                accept=".xlsx"
+                :auto="false"
+                choose-label="Datei auswählen"
+                class="p-button-outlined p-button-secondary w-full"
+                @select="onFileSelect"
               />
             </div>
           </div>
 
-          <div class="col-12 flex flex-column md:flex-row gap-3 mt-4">
+          <div class="col-12 flex flex-column gap-3">
             <Button
-                label="Datei erstellen"
-                severity="primary"
-                icon="pi pi-check"
-                @click="createFile"
-                :disabled="!file || !selectedMonth || !selectedYear"
+              label="Datei erstellen"
+              severity="primary"
+              icon="pi pi-download"
+              :disabled="!file || !selectedMonth || !selectedYear || isProcessing"
+              :loading="isProcessing"
+              class="py-3 font-semibold"
+              @click="createFile"
             />
             <Button
-                label="Zurücksetzen"
-                severity="secondary"
-                icon="pi pi-refresh"
-                text
-                @click="resetForm"
+              label="Zurücksetzen"
+              severity="secondary"
+              icon="pi pi-refresh"
+              text
+              class="py-2"
+              @click="resetForm"
             />
           </div>
         </div>
 
         <div v-if="error" class="mt-4">
-          <Message severity="error" variant="simple">{{ error }}</Message>
+          <Message severity="error" variant="simple" class="text-sm">{{ error }}</Message>
         </div>
         <div v-if="success" class="mt-4">
-          <Message severity="success" variant="simple">Datei wurde erfolgreich erstellt.</Message>
+          <Message severity="success" variant="simple" class="text-sm"
+            >Die Datei wurde erfolgreich erstellt und heruntergeladen.</Message
+          >
         </div>
       </div>
     </main>
 
-    <footer class="footer mt-auto p-4 text-center border-top-1 border-gray-200">
-      <p class="text-sm text-gray-500">
-        &copy; {{ new Date().getFullYear() }} VSLF - Verband Schweizer Lokomotivführer und Anwärter
-      </p>
+    <footer class="footer mt-auto p-4 md:p-6 text-center">
+      <div class="max-w-30rem mx-auto border-top-1 border-slate-200 pt-4">
+        <p class="text-xs text-slate-400 uppercase tracking-wider mb-0">
+          &copy; {{ new Date().getFullYear() }} VSLF &bull; Verband Schweizer Lokomotivführer
+        </p>
+      </div>
     </footer>
   </div>
 </template>
 
 <style>
+:root {
+  --primary-color: #003366;
+}
+
 body {
   margin: 0;
   padding: 0;
   font-family:
-      'Helvetica Neue',
-      Helvetica,
-      Arial,
-      -apple-system,
-      BlinkMacSystemFont,
-      'Segoe UI',
-      Roboto,
-      sans-serif;
-  background-color: #f8f9fa;
-  color: #333;
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .layout-wrapper {
@@ -215,26 +240,54 @@ body {
   min-height: 100vh;
 }
 
-.header {
-  background-color: #ffffff;
-}
-
 .header-logo {
-  height: 40px;
+  height: 32px;
 }
 
 .card {
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #e2e8f0;
 }
 
-.header-title h2 {
-  font-size: 1.25rem;
+.p-button.p-button-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
-@media screen and (max-width: 768px) {
-  .header-title h2 {
-    font-size: 1rem;
-  }
+.p-button.p-button-primary:hover {
+  background-color: #002244;
+  border-color: #002244;
+}
+
+.p-select:focus,
+.p-fileupload-choose:focus {
+  box-shadow:
+    0 0 0 2px #ffffff,
+    0 0 0 4px #00336640;
+}
+
+/* Custom Slate colors as PrimeFlex might not have them all by default depending on version */
+.bg-slate-50 {
+  background-color: #f8fafc;
+}
+.bg-white {
+  background-color: #ffffff;
+}
+.border-slate-200 {
+  border-color: #e2e8f0;
+}
+.text-slate-400 {
+  color: #94a3b8;
+}
+.text-slate-500 {
+  color: #64748b;
+}
+.text-slate-600 {
+  color: #475569;
+}
+.text-slate-700 {
+  color: #334155;
+}
+.text-slate-800 {
+  color: #1e293b;
 }
 </style>
