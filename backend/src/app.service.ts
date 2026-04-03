@@ -4,9 +4,9 @@ import * as XLSX from 'xlsx';
 @Injectable()
 export class AppService {
   convertExcelToVslfText(
-      fileBuffer: Buffer,
-      formYear: string,
-      formMonth: string,
+    fileBuffer: Buffer,
+    formYear: string,
+    formMonth: string,
   ): { filename: string; content: string } {
     const yearMonth = `${formYear}${formMonth}`;
     const filename = `VSLF_${yearMonth}.txt`;
@@ -34,12 +34,12 @@ export class AppService {
 
     const now = new Date();
     const timestamp =
-        now.getFullYear().toString() +
-        (now.getMonth() + 1).toString().padStart(2, '0') +
-        now.getDate().toString().padStart(2, '0') +
-        now.getHours().toString().padStart(2, '0') +
-        now.getMinutes().toString().padStart(2, '0') +
-        now.getSeconds().toString().padStart(2, '0');
+      now.getFullYear().toString() +
+      (now.getMonth() + 1).toString().padStart(2, '0') +
+      now.getDate().toString().padStart(2, '0') +
+      now.getHours().toString().padStart(2, '0') +
+      now.getMinutes().toString().padStart(2, '0') +
+      now.getSeconds().toString().padStart(2, '0');
 
     const betrag = 30.0;
     let total = 0.0;

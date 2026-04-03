@@ -31,11 +31,19 @@ describe('AppController', () => {
         originalname: 'test.xlsx',
       } as Express.Multer.File;
       const mockBody = { form_year: '2026', form_month: '03' };
-      const mockResult = { filename: 'VSLF_202603.txt', content: 'TOP...\nEND...' };
+      const mockResult = {
+        filename: 'VSLF_202603.txt',
+        content: 'TOP...\nEND...',
+      };
 
-      jest.spyOn(appService, 'convertExcelToVslfText').mockReturnValue(mockResult);
+      jest
+        .spyOn(appService, 'convertExcelToVslfText')
+        .mockReturnValue(mockResult);
 
-      const result = await appController.convertExcelToVslfText(mockFile, mockBody);
+      const result = await appController.convertExcelToVslfText(
+        mockFile,
+        mockBody,
+      );
 
       expect(appService.convertExcelToVslfText).toHaveBeenCalledWith(
         mockFile.buffer,

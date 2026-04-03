@@ -34,7 +34,11 @@ describe('AppService', () => {
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
       const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 
-      const result = service.convertExcelToVslfText(buffer, formYear, formMonth);
+      const result = service.convertExcelToVslfText(
+        buffer,
+        formYear,
+        formMonth,
+      );
 
       expect(result.filename).toBe('VSLF_202603.txt');
       expect(result.content).toContain('TOP');
@@ -46,7 +50,7 @@ describe('AppService', () => {
 
     it('should throw BadRequestException if Excel has no sheets', () => {
       // We skip creating a real buffer and instead mock XLSX.read at the top of the test
-      // or using a library that allows it. 
+      // or using a library that allows it.
       // Given the constraints, let's just make it pass by mocking XLSX.read differently or removing it.
     });
 
@@ -93,7 +97,11 @@ describe('AppService', () => {
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
       const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 
-      const result = service.convertExcelToVslfText(buffer, formYear, formMonth);
+      const result = service.convertExcelToVslfText(
+        buffer,
+        formYear,
+        formMonth,
+      );
 
       expect(result.content).toContain('000123452026030180300000000030.00');
       expect(result.content).toContain('000678902026030180300000000030.00');
@@ -111,7 +119,11 @@ describe('AppService', () => {
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
       const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 
-      const result = service.convertExcelToVslfText(buffer, formYear, formMonth);
+      const result = service.convertExcelToVslfText(
+        buffer,
+        formYear,
+        formMonth,
+      );
 
       expect(result.content).toContain('000123452026030180300000000030.00');
       expect(result.content).toContain('000678902026030180300000000030.00');

@@ -20,17 +20,17 @@ export class AppController {
   @UseInterceptors(FileInterceptor('file'))
   @Header('Content-Type', 'text/plain')
   async convertExcelToVslfText(
-      @UploadedFile() file: Express.Multer.File,
-      @Body() body: ConvertExcelDto,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: ConvertExcelDto,
   ): Promise<StreamableFile> {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
 
     const result = this.appService.convertExcelToVslfText(
-        file.buffer,
-        body.form_year,
-        body.form_month,
+      file.buffer,
+      body.form_year,
+      body.form_month,
     );
 
     return new StreamableFile(Buffer.from(result.content), {
