@@ -3,34 +3,39 @@ import {
   Post,
   UseInterceptors,
   UploadedFile,
-  Res,
+  Body,
+  BadRequestException,
+  Header,
+  StreamableFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { type Response } from 'express';
-import * as XLSX from 'xlsx';
-import * as Papa from 'papaparse';
+import { AppService } from './app.service';
+import { ConvertExcelDto } from './dto/convert-excel.dto';
 
 @Controller()
 export class AppController {
+  constructor(private readonly appService: AppService) {}
+
   @Post('convert')
   @UseInterceptors(FileInterceptor('file'))
-  async convertExcelToCsv(
-    @UploadedFile() file: Express.Multer.File,
-    @Res() res: Response,
-  ) {
+  @Header('Content-Type', 'text/plain')
+  async convertExcelToVslfText(
+      @UploadedFile() file: Express.Multer.File,
+      @Body() body: ConvertExcelDto,
+  ): Promise<StreamableFile> {
     if (!file) {
-      return res.status(400).send('No file uploaded');
+      throw new BadRequestException('No file uploaded');
     }
 
-    const workbook = XLSX.read(file.buffer, { type: 'buffer' });
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
-    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+    const result = this.appService.convertExcelToVslfText(
+        file.buffer,
+        body.form_year,
+        body.form_month,
+    );
 
-    const csv = Papa.unparse(jsonData);
-
-    res.header('Content-Type', 'text/csv');
-    res.attachment('converted.csv');
-    return res.send(csv);
+    return new StreamableFile(Buffer.from(result.content), {
+      type: 'text/plain',
+      disposition: `attachment; filename="${result.filename}"`,
+    });
   }
 }

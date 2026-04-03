@@ -13,55 +13,69 @@ const error = ref(null);
 const success = ref(false);
 
 const months = [
-    { name: 'Januar', value: 1 }, { name: 'Februar', value: 2 }, { name: 'März', value: 3 },
-    { name: 'April', value: 4 }, { name: 'Mai', value: 5 }, { name: 'Juni', value: 6 },
-    { name: 'Juli', value: 7 }, { name: 'August', value: 8 }, { name: 'September', value: 9 },
-    { name: 'Oktober', value: 10 }, { name: 'November', value: 11 }, { name: 'Dezember', value: 12 }
+  { name: 'Januar', value: '01' }, { name: 'Februar', value: '02' }, { name: 'März', value: '03' },
+  { name: 'April', value: '04' }, { name: 'Mai', value: '05' }, { name: 'Juni', value: '06' },
+  { name: 'Juli', value: '07' }, { name: 'August', value: '08' }, { name: 'September', value: '09' },
+  { name: 'Oktober', value: '10' }, { name: 'November', value: '11' }, { name: 'Dezember', value: '12' }
 ];
 
-const years = Array.from({ length: 11 }, (_, i) => ({ name: (2020 + i).toString(), value: 2020 + i }));
+const years = Array.from({ length: 11 }, (_, i) => ({
+  name: (2020 + i).toString(),
+  value: (2020 + i).toString(),
+}));
 
 const onFileSelect = (event) => {
-    file.value = event.files[0];
+  file.value = event.files[0];
 };
 
 const resetForm = () => {
-    selectedMonth.value = null;
-    selectedYear.value = null;
-    file.value = null;
-    error.value = null;
-    success.value = false;
+  selectedMonth.value = null;
+  selectedYear.value = null;
+  file.value = null;
+  error.value = null;
+  success.value = false;
 };
 
 const createCSV = async () => {
-    if (!file.value) {
-        error.value = "Bitte wählen Sie eine Datei aus.";
-        return;
-    }
-    error.value = null;
-    success.value = false;
+  if (!file.value) {
+    error.value = 'Bitte wählen Sie eine Datei aus.';
+    return;
+  }
 
-    const formData = new FormData();
-    formData.append('file', file.value);
-    formData.append('month', selectedMonth.value?.value);
-    formData.append('year', selectedYear.value?.value);
+  if (!selectedMonth.value || !selectedYear.value) {
+    error.value = 'Bitte wählen Sie Monat und Jahr aus.';
+    return;
+  }
 
-    try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const response = await axios.post(`${apiUrl}/convert`, formData, {
-            responseType: 'blob'
-        });
+  error.value = null;
+  success.value = false;
 
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'converted.csv');
-        document.body.appendChild(link);
-        link.click();
-        success.value = true;
-    } catch (e) {
-        error.value = "Fehler beim Erstellen der Datei.";
-    }
+  const formData = new FormData();
+  formData.append('file', file.value);
+  formData.append('form_month', selectedMonth.value.value);
+  formData.append('form_year', selectedYear.value.value);
+
+  try {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const response = await axios.post(`${apiUrl}/convert`, formData, {
+      responseType: 'blob',
+    });
+
+    const filename = `VSLF_${selectedYear.value.value}${selectedMonth.value.value}.txt`;
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    success.value = true;
+  } catch {
+    error.value = 'Fehler beim Erstellen der Datei.';
+  }
 };
 </script>
 
