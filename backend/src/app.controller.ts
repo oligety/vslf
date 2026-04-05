@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   Post,
   UseInterceptors,
   UploadedFile,
@@ -37,5 +38,10 @@ export class AppController {
       type: 'text/plain',
       disposition: `attachment; filename="${result.filename}"`,
     });
+  }
+
+  @Get('ping')
+  ping(): string {
+    return 'pong';
   }
 }
