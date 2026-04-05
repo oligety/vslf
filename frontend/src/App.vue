@@ -269,13 +269,6 @@ const createFile = async () => {
     box-shadow 0.2s ease-in-out;
 }
 
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-}
-
 /* Custom Slate colors as PrimeFlex might not have them all by default depending on version */
 .p-fileupload :deep(.p-fileupload-basic) {
   display: flex;
