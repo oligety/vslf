@@ -5,7 +5,7 @@ export class ConvertExcelDto {
   @IsString()
   @IsNotEmpty()
   @Transform(({ value }) => value?.toString())
-  form_year: string;
+  form_year!: string;
 
   @IsString()
   @IsNotEmpty()
@@ -13,5 +13,5 @@ export class ConvertExcelDto {
     message: 'form_month must be a two-digit month from 01 to 12',
   })
   @Transform(({ value }) => value?.toString().padStart(2, '0'))
-  form_month: string;
+  form_month!: string;
 }
