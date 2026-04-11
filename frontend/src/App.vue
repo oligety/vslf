@@ -166,7 +166,7 @@ const createFile = async () => {
           </div>
           <!-- Datei -->
           <div class="field col-12 mb-4">
-            <label for="file" class="block font-medium text-slate-700 mb-1 text-sm"
+            <label for="file" class="block font-medium text-slate-700 mb-2 text-sm"
               >Excel-Datei (.xlsx)</label
             >
             <div class="flex flex-column">
