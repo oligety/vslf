@@ -34,11 +34,7 @@ describe('AppService', () => {
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
       const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 
-      const result = service.convertExcelToVslfText(
-        buffer,
-        formYear,
-        formMonth,
-      );
+      const result = service.convertExcelToVslfText(buffer, formYear, formMonth);
 
       expect(result.filename).toBe('VSLF_202603.txt');
       expect(result.content).toContain('TOP');
@@ -60,12 +56,8 @@ describe('AppService', () => {
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
       const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 
-      expect(() =>
-        service.convertExcelToVslfText(buffer, formYear, formMonth),
-      ).toThrow(BadRequestException);
-      expect(() =>
-        service.convertExcelToVslfText(buffer, formYear, formMonth),
-      ).toThrow('Excel file is empty');
+      expect(() => service.convertExcelToVslfText(buffer, formYear, formMonth)).toThrow(BadRequestException);
+      expect(() => service.convertExcelToVslfText(buffer, formYear, formMonth)).toThrow('Excel file is empty');
     });
 
     it('should throw BadRequestException if column "Personal Nr.SBB" is not found', () => {
@@ -78,12 +70,10 @@ describe('AppService', () => {
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
       const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 
-      expect(() =>
-        service.convertExcelToVslfText(buffer, formYear, formMonth),
-      ).toThrow(BadRequestException);
-      expect(() =>
-        service.convertExcelToVslfText(buffer, formYear, formMonth),
-      ).toThrow('Column "Personal Nr.SBB" not found');
+      expect(() => service.convertExcelToVslfText(buffer, formYear, formMonth)).toThrow(BadRequestException);
+      expect(() => service.convertExcelToVslfText(buffer, formYear, formMonth)).toThrow(
+        'Column "Personal Nr.SBB" not found',
+      );
     });
 
     it('should handle different formats of personal number (numbers and strings)', () => {
@@ -97,11 +87,7 @@ describe('AppService', () => {
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
       const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 
-      const result = service.convertExcelToVslfText(
-        buffer,
-        formYear,
-        formMonth,
-      );
+      const result = service.convertExcelToVslfText(buffer, formYear, formMonth);
 
       expect(result.content).toContain('000123452026030180300000000030.00');
       expect(result.content).toContain('000678902026030180300000000030.00');
@@ -119,11 +105,7 @@ describe('AppService', () => {
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
       const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 
-      const result = service.convertExcelToVslfText(
-        buffer,
-        formYear,
-        formMonth,
-      );
+      const result = service.convertExcelToVslfText(buffer, formYear, formMonth);
 
       expect(result.content).toContain('000123452026030180300000000030.00');
       expect(result.content).toContain('000678902026030180300000000030.00');

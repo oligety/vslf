@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import axios from 'axios';
-import Select from 'primevue/select';
-import FileUpload, { type FileUploadSelectEvent } from 'primevue/fileupload';
-import Button from 'primevue/button';
-import Message from 'primevue/message';
-import logo from './assets/VSLF_Logo_dunkel_26.svg';
+import { ref } from 'vue'
+import axios from 'axios'
+import Select from 'primevue/select'
+import FileUpload, { type FileUploadSelectEvent } from 'primevue/fileupload'
+import Button from 'primevue/button'
+import Message from 'primevue/message'
+import logo from './assets/VSLF_Logo_dunkel_26.svg'
 
 interface Option {
-  name: string;
-  value: string;
+  name: string
+  value: string
 }
 
-const API_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000';
-const DOWNLOAD_FILENAME_PREFIX = 'VSLF_';
+const API_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3000'
+const DOWNLOAD_FILENAME_PREFIX = 'VSLF_'
 
 const MONTHS: Option[] = [
   { name: 'Januar', value: '01' },
@@ -27,93 +27,93 @@ const MONTHS: Option[] = [
   { name: 'September', value: '09' },
   { name: 'Oktober', value: '10' },
   { name: 'November', value: '11' },
-  { name: 'Dezember', value: '12' },
-];
+  { name: 'Dezember', value: '12' }
+]
 
 const YEARS: Option[] = Array.from({ length: 11 }, (_, i) => {
-  const year = String(2025 + i);
-  return { name: year, value: year };
-});
+  const year = String(2025 + i)
+  return { name: year, value: year }
+})
 
-const selectedMonth = ref<Option | null>(null);
-const selectedYear = ref<Option | null>(null);
-const file = ref<File | null>(null);
-const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null);
-const error = ref<string | null>(null);
-const success = ref<boolean>(false);
-const isProcessing = ref<boolean>(false);
+const selectedMonth = ref<Option | null>(null)
+const selectedYear = ref<Option | null>(null)
+const file = ref<File | null>(null)
+const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null)
+const error = ref<string | null>(null)
+const success = ref<boolean>(false)
+const isProcessing = ref<boolean>(false)
 
 const onFileSelect = (event: FileUploadSelectEvent) => {
-  file.value = event.files[0];
-  error.value = null;
-  success.value = false;
-};
+  file.value = event.files[0]
+  error.value = null
+  success.value = false
+}
 
 const setError = (message: string) => {
-  error.value = message;
-  success.value = false;
-};
+  error.value = message
+  success.value = false
+}
 
 const resetFile = () => {
-  file.value = null;
-  fileUploadRef.value?.clear();
-};
+  file.value = null
+  fileUploadRef.value?.clear()
+}
 
 const resetForm = () => {
-  selectedMonth.value = null;
-  selectedYear.value = null;
-  resetFile();
-  error.value = null;
-  success.value = false;
-};
+  selectedMonth.value = null
+  selectedYear.value = null
+  resetFile()
+  error.value = null
+  success.value = false
+}
 
 const downloadBlob = (blob: Blob, filename: string) => {
-  const url = window.URL.createObjectURL(blob);
-  const link = document.createElement('a');
+  const url = window.URL.createObjectURL(blob)
+  const link = document.createElement('a')
 
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
 
-  window.URL.revokeObjectURL(url);
-};
+  window.URL.revokeObjectURL(url)
+}
 
 const createFile = async () => {
   if (!file.value) {
-    setError('Bitte wählen Sie eine Datei aus.');
-    return;
+    setError('Bitte wählen Sie eine Datei aus.')
+    return
   }
 
   if (!selectedMonth.value || !selectedYear.value) {
-    setError('Bitte wählen Sie Monat und Jahr aus.');
-    return;
+    setError('Bitte wählen Sie Monat und Jahr aus.')
+    return
   }
 
-  error.value = null;
-  success.value = false;
-  isProcessing.value = true;
+  error.value = null
+  success.value = false
+  isProcessing.value = true
 
-  const formData = new FormData();
-  formData.append('file', file.value);
-  formData.append('form_month', selectedMonth.value.value);
-  formData.append('form_year', selectedYear.value.value);
+  const formData = new FormData()
+  formData.append('file', file.value)
+  formData.append('form_month', selectedMonth.value.value)
+  formData.append('form_year', selectedYear.value.value)
 
   try {
     const response = await axios.post(`${API_URL}/convert`, formData, {
-      responseType: 'blob',
-    });
+      responseType: 'blob'
+    })
 
-    const filename = `${DOWNLOAD_FILENAME_PREFIX}${selectedYear.value.value}${selectedMonth.value.value}.txt`;
-    downloadBlob(new Blob([response.data]), filename);
-    success.value = true;
+    const filename = `${DOWNLOAD_FILENAME_PREFIX}${selectedYear.value.value}${selectedMonth.value.value}.txt`
+    downloadBlob(new Blob([response.data]), filename)
+    success.value = true
   } catch {
-    error.value = 'Fehler beim Erstellen der Datei.';
+    error.value = 'Fehler beim Erstellen der Datei.'
   } finally {
-    isProcessing.value = false;
+    isProcessing.value = false
   }
-};
+}
 </script>
 
 <template>
@@ -122,7 +122,11 @@ const createFile = async () => {
       class="header sticky top-0 z-50 flex align-items-center px-4 md:px-6 py-2 bg-white-alpha-90 backdrop-blur-sm border-bottom-1 border-slate-200 shadow-sm"
     >
       <div class="container flex align-items-center w-full max-w-30rem mx-auto">
-        <img :src="logo" alt="VSLF Logo" class="header-logo" />
+        <img
+          :src="logo"
+          alt="VSLF Logo"
+          class="header-logo"
+        />
         <div class="header-title ml-4">
           <h1 class="m-0 text-xl font-semibold text-slate-800">SBB Datenexport</h1>
         </div>
@@ -142,7 +146,11 @@ const createFile = async () => {
         <div class="grid formgrid p-fluid">
           <!-- Monat -->
           <div class="field col-12 md:col-6 mb-3">
-            <label for="month" class="block font-medium text-slate-700 mb-1 text-sm">Monat</label>
+            <label
+              for="month"
+              class="block font-medium text-slate-700 mb-1 text-sm"
+              >Monat</label
+            >
             <Select
               id="month"
               v-model="selectedMonth"
@@ -154,7 +162,11 @@ const createFile = async () => {
           </div>
           <!-- Jahr -->
           <div class="field col-12 md:col-6 mb-3">
-            <label for="year" class="block font-medium text-slate-700 mb-1 text-sm">Jahr</label>
+            <label
+              for="year"
+              class="block font-medium text-slate-700 mb-1 text-sm"
+              >Jahr</label
+            >
             <Select
               id="year"
               v-model="selectedYear"
@@ -166,21 +178,23 @@ const createFile = async () => {
           </div>
           <!-- Datei -->
           <div class="field col-12 mb-4">
-            <label for="file" class="block font-medium text-slate-700 mb-2 text-sm"
-              >Excel-Datei (.xlsx)</label
+            <label
+              for="file"
+              class="block font-medium text-slate-700 mb-2 text-sm"
+              >Excel-Datei</label
             >
             <div class="flex flex-column">
               <FileUpload
                 ref="fileUploadRef"
                 mode="basic"
                 name="file"
-                accept=".xlsx"
-                :auto="true"
+                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .xlsx, .xls"
+                :auto="false"
                 custom-upload
                 choose-label="Excel-Datei auswählen"
                 :class="[
                   'w-full p-button-sm transition-all transition-duration-200 justify-content-center',
-                  file ? 'p-button-success' : 'p-button-secondary p-button-outlined border-dashed',
+                  file ? 'p-button-success' : 'p-button-secondary p-button-outlined border-dashed'
                 ]"
                 @select="onFileSelect"
               />
@@ -220,11 +234,25 @@ const createFile = async () => {
           </div>
         </div>
 
-        <div v-if="error" class="mt-3">
-          <Message severity="error" variant="simple" class="text-xs">{{ error }}</Message>
+        <div
+          v-if="error"
+          class="mt-3"
+        >
+          <Message
+            severity="error"
+            variant="simple"
+            class="text-xs"
+            >{{ error }}</Message
+          >
         </div>
-        <div v-if="success" class="mt-3">
-          <Message severity="success" variant="simple" class="text-xs"
+        <div
+          v-if="success"
+          class="mt-3"
+        >
+          <Message
+            severity="success"
+            variant="simple"
+            class="text-xs"
             >Die Datei wurde erfolgreich erstellt.</Message
           >
         </div>

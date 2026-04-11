@@ -28,11 +28,7 @@ export class AppController {
       throw new BadRequestException('No file uploaded');
     }
 
-    const result = this.appService.convertExcelToVslfText(
-      file.buffer,
-      body.form_year,
-      body.form_month,
-    );
+    const result = this.appService.convertExcelToVslfText(file.buffer, body.form_year, body.form_month);
 
     return new StreamableFile(Buffer.from(result.content), {
       type: 'text/plain',

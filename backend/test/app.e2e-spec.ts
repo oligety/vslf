@@ -17,9 +17,6 @@ describe('AppController (e2e)', () => {
   });
 
   it('/convert (POST) should return 400 if no file', () => {
-    return request(app.getHttpServer())
-      .post('/convert')
-      .send({ form_year: '2026', form_month: '03' })
-      .expect(400);
+    return request(app.getHttpServer()).post('/convert').send({ form_year: '2026', form_month: '03' }).expect(400);
   });
 });

@@ -1,0 +1,10 @@
+# Build and cache outputs
+dist/
+node_modules/
+.data/
+
+# Other non-code files
+.eslintrc.js
+*.lock
+package-lock.json
+yarn.lock

@@ -36,14 +36,9 @@ describe('AppController', () => {
         content: 'TOP...\nEND...',
       };
 
-      jest
-        .spyOn(appService, 'convertExcelToVslfText')
-        .mockReturnValue(mockResult);
+      jest.spyOn(appService, 'convertExcelToVslfText').mockReturnValue(mockResult);
 
-      const result = await appController.convertExcelToVslfText(
-        mockFile,
-        mockBody,
-      );
+      const result = await appController.convertExcelToVslfText(mockFile, mockBody);
 
       expect(appService.convertExcelToVslfText).toHaveBeenCalledWith(
         mockFile.buffer,
@@ -56,9 +51,9 @@ describe('AppController', () => {
     it('should throw BadRequestException if no file is provided', async () => {
       const mockBody = { form_year: '2026', form_month: '03' };
 
-      await expect(
-        appController.convertExcelToVslfText(undefined as any, mockBody),
-      ).rejects.toThrow(BadRequestException);
+      await expect(appController.convertExcelToVslfText(undefined as any, mockBody)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 });
